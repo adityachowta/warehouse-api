@@ -1,0 +1,25 @@
+{
+  "name": "warehouse-api",
+  "version": "1.0.0",
+  "description": "this is a web api for warehouse inventory management",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adityachowta/warehouse-api.git"
+  },
+  "author": "Aditya Chowta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adityachowta/warehouse-api/issues"
+  },
+  "homepage": "https://github.com/adityachowta/warehouse-api#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.2",
+    "nodemon": "^2.0.21"
+  }
+}
