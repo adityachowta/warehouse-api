@@ -1,9 +1,6 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-// const inventorySchema = require('./inventory')
-
-
 
 const productSchema = new Schema({
     "name": {

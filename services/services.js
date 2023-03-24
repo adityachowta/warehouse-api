@@ -3,10 +3,8 @@ const inventoryModel = require('../model/inventory')
 
 class Services {
 
-    constructor() {
-
-    }
-
+    constructor() {}
+    
     async checkInventory(contain_articles) {
         try {
 

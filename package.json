@@ -4,7 +4,8 @@
   "description": "this is a web api for warehouse inventory management",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "dev": "export NODE_ENV=development&& nodemon app.js",
+    "prod": "export NODE_ENV=production&& nodemon app.js"
   },
   "repository": {
     "type": "git",

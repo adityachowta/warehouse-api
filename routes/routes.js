@@ -55,7 +55,6 @@ router.get('/get-product/:id', async (req, res) => {
 router.post('/sell-products', async (req, res) => {
     try {
         const data = await productModel.findById(req.body.id);
-        console.log(data)
 
         if (data != null) {
             var contain_articles = data.contain_articles
