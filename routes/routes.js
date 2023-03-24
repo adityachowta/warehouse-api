@@ -42,14 +42,33 @@ router.get('/get-product/:id', async (req, res) => {
 })
 
 // sell product and update inventory:
-router.post('/sell-products', async(req, res)=>{
+router.post('/sell-products', async (req, res) => {
     try {
         const data = await productModel.findById(req.body.id);
-        
+
+        console.log("contains > ", data.contain_articles)
+
+        var contain_articles = data.contain_articles
+
+        var isStock = await service.checkInventory(contain_articles)
+
+        console.log(isStock)
+
+        if (isStock) {
+            for (const article of contain_articles) {
+                console.log(article.art_id)
+                await service.updateInventory(article.art_id, article.amount_of);
+            }
+            res.json({ "status": 200, "message": "Product sold" })
+
+        } else {
+            res.status(400).json({ status: 400, message: "insufficient stock of articles." })
+        }
+
         productModel.deleteOne(req.body.id);
         service.updateInventory();
     } catch (error) {
-        
+        res.status(400).json({ status: 400, message: error.message })
     }
 })
 
