@@ -7,18 +7,28 @@ const Services = require('../services/services')
 const service = new Services()
 
 // create a new product:
-router.post('/add-product', async (req, res) => {
-    const data = new productModel({
-        name: req.body.name,
-        contain_articles: req.body.contain_articles
-    })
+router.post('/add-products', async (req, res) => {
 
     try {
-        const dataToSave = await data.save();
-        res.status(200).json(dataToSave);
+        var products = req.body.products;
+
+        for (const item of products) {
+            const data = new productModel({
+                name: item.name,
+                contain_articles: item.contain_articles
+            })
+
+            await data.save();
+
+        }
+
+        res.status(200).json({ message: "products uploaded" });
+
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
+
+
 });
 
 // fetch all products:
@@ -45,48 +55,58 @@ router.get('/get-product/:id', async (req, res) => {
 router.post('/sell-products', async (req, res) => {
     try {
         const data = await productModel.findById(req.body.id);
+        console.log(data)
 
-        console.log("contains > ", data.contain_articles)
+        if (data != null) {
+            var contain_articles = data.contain_articles
 
-        var contain_articles = data.contain_articles
+            var isStock = await service.checkInventory(contain_articles);
 
-        var isStock = await service.checkInventory(contain_articles)
+            if (isStock) {
+                for (const article of contain_articles) {
+                    console.log(article.art_id)
+                    await service.updateInventory(article.art_id, article.amount_of);
+                }
 
-        console.log(isStock)
+                await productModel.deleteOne({ '_id': req.body.id });
+                res.json({ "status": 200, "message": "Product sold" })
 
-        if (isStock) {
-            for (const article of contain_articles) {
-                console.log(article.art_id)
-                await service.updateInventory(article.art_id, article.amount_of);
+            } else {
+                res.status(400).json({ status: 400, message: "insufficient stock of articles." })
             }
-            res.json({ "status": 200, "message": "Product sold" })
-
         } else {
-            res.status(400).json({ status: 400, message: "insufficient stock of articles." })
+            res.json({ "status": 400, "message": "Product unavailable" })
         }
 
-        productModel.deleteOne(req.body.id);
-        service.updateInventory();
     } catch (error) {
         res.status(400).json({ status: 400, message: error.message })
     }
 })
 
+// load inventory item
 router.post('/load-inventory', async (req, res) => {
-    const data = new inventoryModel({
-        art_id: req.body.art_id,
-        name: req.body.name,
-        stock: req.body.stock
-    })
-
     try {
-        const dataToSave = await data.save();
-        res.status(200).json(dataToSave);
+        var inventory = req.body.inventory;
+
+        for (const item of inventory) {
+            const data = new inventoryModel({
+                art_id: item.art_id,
+                name: item.name,
+                stock: item.stock
+            })
+
+            await data.save();
+
+        }
+
+        res.status(200).json({ message: "inventory updated" });
+
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 });
 
+// get inventory items
 router.get('/get-inventory', async (req, res) => {
     try {
         const data = await inventoryModel.find();
@@ -96,6 +116,7 @@ router.get('/get-inventory', async (req, res) => {
     }
 });
 
+//get inventory by id
 router.get('/get-one-inventory/:id', async (req, res) => {
     try {
         const data = await inventoryModel.findById(req.params.id);
